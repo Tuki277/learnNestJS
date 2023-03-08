@@ -1,0 +1,53 @@
+version: '3.9'
+
+networks:
+  dev:
+    driver: bridge
+
+services:
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/apps/mongo:/data/mongodb
+    container_name: mongodb
+    networks:
+      - dev
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/apps/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_PASSWORD=admin123
+      - MYSQL_DATABASE=DemoNestJS
+    networks:
+      - dev
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    networks:
+      - dev
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/data/postgresql
+    environment:
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_USER=root
+    networks:
+      - dev
